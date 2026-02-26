@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"next dev\" \"cd backend/core && uvicorn server:app --port 8000\",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
