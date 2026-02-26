@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { Suspense, useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Mic, Send, Trash2, Copy, ArrowLeft } from 'lucide-react'
@@ -23,6 +23,18 @@ type Message = {
 }
 
 export default function Chat() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-orange-300 p-8 flex items-center justify-center">
+        <p className="text-xl font-bold border-4 border-black bg-white p-4 uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">Loading...</p>
+      </div>
+    }>
+      <ChatContent />
+    </Suspense>
+  )
+}
+
+function ChatContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const figureId = searchParams.get('figure') || ''
