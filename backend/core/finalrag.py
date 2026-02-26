@@ -1,37 +1,33 @@
-#gemini rag (no weightages now)
+# gemini rag (api-ready version)
 
 import vertexai
 from vertexai.preview.language_models import TextEmbeddingModel
 from vertexai.generative_models import GenerativeModel
 import chromadb
 
-
 project_id = "project-a46bff91-9ff5-47ac-81d"
 location = "us-central1"
-db_path = r"D:\Users\Documents\Symbiosis\TensorSmiths\GSA\backend\chroma_db"   #change for others
-
+db_path = r"D:\Users\Documents\Symbiosis\TensorSmiths\GSA\backend\chroma_db"  # change for others
 
 vertexai.init(project=project_id, location=location)
 
-embed_model = TextEmbeddingModel.from_pretrained("text-embedding-004")  
-llm = GenerativeModel("gemini-2.0-flash")   #can change
-
+embed_model = TextEmbeddingModel.from_pretrained("text-embedding-004")
+llm = GenerativeModel("gemini-2.0-flash")
 
 client = chromadb.PersistentClient(path=db_path)
-collection = client.get_collection(name="museum_collection")   #same as collection name in embedding file
+collection = client.get_collection(name="museum_collection")
 
 
-while True:
-    question = input("\nAsk: ")
+def run_rag(question: str):
 
-    query_vec = embed_model.get_embeddings([question])[0].values   #embed question
+    query_vec = embed_model.get_embeddings([question])[0].values
 
     search_result = collection.query(
         query_embeddings=[query_vec],
         n_results=3
     )
 
-    docs = search_result["documents"][0]   #top 3 matches (or can change from the RAG file)
+    docs = search_result["documents"][0]
     context_text = "\n\n".join(docs)
 
     prompt = f"""
@@ -66,8 +62,8 @@ Question:
 {question}
 
 Answer:
-"""   #change for others
+"""
 
     reply = llm.generate_content(prompt)
 
-    print("\nAI:\n", reply.text)
+    return reply.text
