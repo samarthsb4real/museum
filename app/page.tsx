@@ -1,176 +1,49 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
-import { Mic, Send, Trash2, Copy } from 'lucide-react'
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+import { useRouter } from 'next/navigation'
 
-const HISTORICAL_FIGURES = [
-  { id: 'einstein', name: 'Albert Einstein' },
-  { id: 'cleopatra', name: 'Cleopatra' },
-  { id: 'shakespeare', name: 'William Shakespeare' },
-  { id: 'davinci', name: 'Leonardo da Vinci' },
-  { id: 'curie', name: 'Marie Curie' },
+const INDIAN_FIGURES = [
+  { id: 'gandhi', name: 'Mahatma Gandhi', era: '1869-1948', role: 'Freedom Fighter', img: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg' },
+  { id: 'ambedkar', name: 'Dr. B.R. Ambedkar', era: '1891-1956', role: 'Constitution Architect', img: 'https://upload.wikimedia.org/wikipedia/commons/1/14/B._R._Ambedkar.jpg' },
+  { id: 'bose', name: 'Subhas Chandra Bose', era: '1897-1945', role: 'Revolutionary Leader', img: 'https://upload.wikimedia.org/wikipedia/commons/5/59/Subhas_Chandra_Bose_1945.jpg' },
+  { id: 'nehru', name: 'Jawaharlal Nehru', era: '1889-1964', role: 'First Prime Minister', img: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Jawaharlal_Nehru_1959_%28cropped%29.jpg' },
+  { id: 'patel', name: 'Sardar Vallabhbhai Patel', era: '1875-1950', role: 'Iron Man of India', img: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Sardar_Patel.jpg' },
+  { id: 'azad', name: 'Maulana Abul Kalam Azad', era: '1888-1958', role: 'Scholar & Freedom Fighter', img: 'https://upload.wikimedia.org/wikipedia/commons/f/f3/Maulana_Azad.jpg' },
 ]
 
-type Message = {
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: Date
-}
-
-export default function Home() {
-  const [selectedFigure, setSelectedFigure] = useState('')
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition()
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (transcript) setInput(transcript)
-  }, [transcript])
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  const handleSend = () => {
-    if (!input.trim() || !selectedFigure) return
-    
-    setMessages(prev => [...prev, { role: 'user', content: input, timestamp: new Date() }])
-    
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: `As ${HISTORICAL_FIGURES.find(f => f.id === selectedFigure)?.name}, I would say...`,
-        timestamp: new Date()
-      }])
-    }, 1000)
-    
-    setInput('')
-    resetTranscript()
-  }
-
-  const toggleRecording = () => {
-    if (!browserSupportsSpeechRecognition) {
-      alert('Browser does not support speech recognition')
-      return
-    }
-    
-    if (listening) {
-      SpeechRecognition.stopListening()
-    } else {
-      resetTranscript()
-      setInput('')
-      SpeechRecognition.startListening({ continuous: true })
-    }
-  }
-
-  const clearChat = () => {
-    setMessages([])
-  }
-
-  const copyMessage = (content: string) => {
-    navigator.clipboard.writeText(content)
-  }
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-  }
+export default function Landing() {
+  const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-yellow-300 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-6xl font-bold mb-8 border-8 border-black bg-white p-6 uppercase shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          Historical Museum
-        </h1>
-
-        <div className="border-8 border-black bg-white p-6 mb-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex items-center justify-between mb-4">
-            <label className="text-xl uppercase">Select Historical Figure:</label>
-            {messages.length > 0 && (
-              <Button onClick={clearChat} className="bg-red-200 hover:bg-red-500 px-4 py-2">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Clear
-              </Button>
-            )}
-          </div>
-          <Select 
-            value={selectedFigure} 
-            onChange={(e) => setSelectedFigure(e.target.value)}
-            className="w-full"
-          >
-            <option value="">Choose a figure...</option>
-            {HISTORICAL_FIGURES.map(figure => (
-              <option key={figure.id} value={figure.id}>{figure.name}</option>
-            ))}
-          </Select>
+    <div className="min-h-screen bg-orange-300 p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-7xl font-bold mb-6 border-8 border-black bg-white p-8 uppercase shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] inline-block">
+            Chat with History
+          </h1>
+          <p className="text-2xl font-bold mt-6 uppercase bg-white border-4 border-black p-4 inline-block shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">Select a Historical Figure</p>
         </div>
 
-        {selectedFigure && (
-          <>
-            <div className="border-8 border-black bg-white p-6 mb-6 h-[500px] overflow-y-auto shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              {messages.length === 0 ? (
-                <p className="text-gray-500 uppercase">Start chatting with {HISTORICAL_FIGURES.find(f => f.id === selectedFigure)?.name}...</p>
-              ) : (
-                <div className="space-y-4">
-                  {messages.map((msg, idx) => (
-                    <div
-                      key={idx}
-                      className={`border-4 border-black p-4 relative group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
-                        msg.role === 'user' ? 'bg-blue-200 ml-12' : 'bg-green-200 mr-12'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="text-xs uppercase font-bold">
-                          {msg.role === 'user' ? 'You' : HISTORICAL_FIGURES.find(f => f.id === selectedFigure)?.name}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-600">{formatTime(msg.timestamp)}</span>
-                          <button
-                            onClick={() => copyMessage(msg.content)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <div>{msg.content}</div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-              )}
-            </div>
-
-            <div className="border-8 border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <div className="flex gap-4 items-end">
-                <div className="flex-1">
-                  <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                    placeholder="TYPE YOUR MESSAGE..."
-                    className="w-full"
-                  />
-                  {listening && <p className="text-xs mt-2 text-red-600 uppercase font-bold">● Recording...</p>}
-                </div>
-                <Button
-                  onClick={toggleRecording}
-                  className={listening ? 'bg-red-500 border-red-700 text-white' : ''}
-                  title="Voice input"
-                >
-                  <Mic className="w-5 h-5" />
-                </Button>
-                <Button onClick={handleSend} disabled={!input.trim()} title="Send message">
-                  <Send className="w-5 h-5" />
-                </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {INDIAN_FIGURES.map((figure) => (
+            <div
+              key={figure.id}
+              className="border-8 border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-4px] hover:translate-y-[-4px] transition-all cursor-pointer"
+              onClick={() => router.push(`/chat?figure=${figure.id}`)}
+            >
+              <div className="border-4 border-black bg-yellow-200 h-48 mb-4 flex items-center justify-center overflow-hidden">
+                <img src={figure.img} alt={figure.name} className="w-full h-full object-cover object-top" />
               </div>
+              <h2 className="text-2xl font-bold uppercase mb-2">{figure.name}</h2>
+              <p className="text-sm font-bold mb-1">{figure.era}</p>
+              <p className="text-sm border-t-4 border-black pt-2 mt-2 uppercase">{figure.role}</p>
+              <Button className="w-full mt-4 bg-green-300 hover:bg-green-500">
+                Start Chat
+              </Button>
             </div>
-          </>
-        )}
+          ))}
+        </div>
       </div>
     </div>
   )
