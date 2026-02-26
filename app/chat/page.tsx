@@ -43,27 +43,27 @@ export default function Chat() {
 
   const handleSend = async () => {
     if (!input.trim() || !selectedFigure) return
-    
+
     const userMessage = { role: 'user' as const, content: input, timestamp: new Date() }
     setMessages(prev => [...prev, userMessage])
     setInput('')
     resetTranscript()
-    
+
     try {
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const response = await fetch('http://127.0.0.1:8000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input, figure: figureId })
+        body: JSON.stringify({ message: input })
       })
       const data = await response.json()
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
         content: data.response,
         timestamp: new Date()
       }])
     } catch (error) {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
         content: 'Sorry, I am unable to respond at the moment.',
         timestamp: new Date()
       }])
@@ -75,7 +75,7 @@ export default function Chat() {
       alert('Browser does not support speech recognition')
       return
     }
-    
+
     if (listening) {
       SpeechRecognition.stopListening()
     } else {
@@ -114,9 +114,8 @@ export default function Chat() {
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`border-4 border-black p-4 relative group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
-                    msg.role === 'user' ? 'bg-blue-200 ml-12' : 'bg-green-200 mr-12'
-                  }`}
+                  className={`border-4 border-black p-4 relative group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${msg.role === 'user' ? 'bg-blue-200 ml-12' : 'bg-green-200 mr-12'
+                    }`}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="text-xs uppercase font-bold">
