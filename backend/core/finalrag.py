@@ -4,10 +4,13 @@ import vertexai
 from vertexai.preview.language_models import TextEmbeddingModel
 from vertexai.generative_models import GenerativeModel
 import chromadb
+import os
+
+BASE_DIR = os.path.dirname(__file__)
+db_path = os.path.join(BASE_DIR, "chroma_db")
 
 project_id = "project-a46bff91-9ff5-47ac-81d"
 location = "us-central1"
-db_path = r"D:\Users\Documents\Symbiosis\TensorSmiths\GSA\backend\chroma_db"  # change for others
 
 vertexai.init(project=project_id, location=location)
 
@@ -67,3 +70,4 @@ Answer:
     reply = llm.generate_content(prompt)
 
     return reply.text
+
